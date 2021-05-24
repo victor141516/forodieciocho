@@ -10,13 +10,16 @@ export class Requester {
   }
 
   private async fetch(payload: unknown): Promise<any> {
-    return fetch('http://localhost:8191/v1', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(payload),
-    }).then((r) => r.json());
+    return fetch(
+      `http://${process.env.FLARESOLVERR_HOST || 'localhost'}:8191/v1`,
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(payload),
+      }
+    ).then((r) => r.json());
   }
 
   private async getNewSessionId(): Promise<string> {
@@ -31,7 +34,7 @@ export class Requester {
     return this.fetch({
       cmd: 'request.get',
       url: url,
-      maxTimeout: 60000,
+      maxTimeout: 120000,
       session: await this.sessionId,
     }).then((r) => r.solution.response);
   }

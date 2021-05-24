@@ -13,22 +13,34 @@ docker network create forodieciocho
 Then we need redis:
 
 ```sh
-docker run \
+docker run -d \
     --name forodieciocho-redis \
     --network forodieciocho \
     -v /path/data:/data \
     -d redis redis-server --appendonly yes
 ```
 
+Then we need [FlareSolverr](https://github.com/ngosang/FlareSolverr):
+
+```sh
+docker run -d \
+    --name forodieciocho-flaresolverr \
+    --network forodieciocho \
+    -e LOG_LEVEL=info \
+    --restart unless-stopped \
+    ghcr.io/flaresolverr/flaresolverr:latest
+```
+
 Then run:
 
 ```sh
-docker run \
+docker run -d \
     --name forodieciocho-app \
     --network forodieciocho \
     --restart always \
     -e PORT=3000 \
     -e REDIS_HOST=forodieciocho-redis \
+    -e FLARESOLVERR_HOST=forodieciocho-flaresolverr \
     -p 3000:3000 \
     victor141516/forodieciocho
 ```
