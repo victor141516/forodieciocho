@@ -4,11 +4,18 @@ Scrape +1X posts from forocoches
 
 ## How to run
 
-First we need redis:
+First lets create a Docker network:
+
+```sh
+docker network create forodieciocho
+```
+
+Then we need redis:
 
 ```sh
 docker run \
     --name forodieciocho-redis \
+    --network forodieciocho \
     -v /path/data:/data \
     -d redis redis-server --appendonly yes
 ```
@@ -18,6 +25,7 @@ Then run:
 ```sh
 docker run \
     --name forodieciocho-app \
+    --network forodieciocho \
     --restart always \
     -e PORT=3000 \
     -p 3000:3000
