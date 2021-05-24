@@ -4,7 +4,7 @@
         :href="`https://www.forocoches.com/foro/showthread.php?t=${post.id}`"
         target="_blank"
     >
-        <div class="flex mr-2 w-12">
+        <div class="flex mr-2 w-20">
             <span class="mx-auto my-auto">{{ getPostIcon(post) }}</span>
         </div>
         <span>{{ post.title }}</span></a

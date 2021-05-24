@@ -4,16 +4,26 @@ import cors from 'cors';
 import express from 'express';
 import { JSDOM } from 'jsdom';
 
-import { Database } from './libs/database';
+import { ChunkOpts, Database } from './libs/database';
 import { CATEGORY_REGEX, Post, PostCategory } from './libs/post';
 import { Requester } from './libs/requester';
 
-const PORT = process.env.PORT || 3000;
-const db = new Database({ host: process.env.REDIS_HOST || undefined });
+const PORT = process.env.PORT || 3001;
+const db = new Database(process.env.MONGO_URL);
 const requester = new Requester(process.env.REQUESTER_SESSION_ID);
 
-const STATIC = path.resolve(__dirname, 'static');
-const INDEX = path.resolve(STATIC, 'index.html');
+let STATIC = '';
+let INDEX = '';
+
+try {
+  STATIC = path.resolve(__dirname, 'static');
+  INDEX = path.resolve(STATIC, 'index.html');
+} catch (error) {
+  console.warn(
+    'Error getting client files. This should only happen during development. Error:',
+    error
+  );
+}
 const app = express();
 app.use(cors());
 
@@ -41,16 +51,18 @@ app.post('/api/scrape', async (req, res) => {
         )
     );
 
-  const count = (await Promise.all(posts.map((p) => db.set(p.id, p)))).length;
-
+  const count = (await Promise.all(posts.map((p) => db.insert(p)))).length;
   res.json({ count }).end();
 });
 
 app.get('/api/posts', async (req, res) => {
-  const { posts, cursor } = await db.chunk(req.query.from as string);
+  const params = {} as ChunkOpts;
+  if (req.query.from) params.from = Number.parseInt(req.query.from as string);
+  if (req.query.search) params.titleContainsFilter = req.query.search as string;
+  const { posts, cursor } = await db.chunk(params);
   res
     .json({
-      posts: posts.map((p) => JSON.parse(p.serialize())),
+      posts: posts.map((p) => p.serialize()),
       cursor,
     })
     .end();

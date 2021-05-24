@@ -1,61 +1,66 @@
-import * as redis from 'redis';
-import { Post } from '../post';
+import { Collection, MongoClient } from 'mongodb';
+import { Post, PostCategory } from '../post';
+
+export interface ChunkOpts {
+  from?: number;
+  limit?: number;
+  categoryFilter?: PostCategory;
+  titleContainsFilter?: string;
+}
 
 export class Database {
-  readonly redisClient: redis.RedisClient;
+  private readonly client: MongoClient;
+  private readonly collection: Promise<Collection>;
 
-  constructor(options?: redis.ClientOpts) {
-    this.redisClient = redis.createClient(options);
-  }
+  constructor(mongoUrl?: string) {
+    this.client = new MongoClient(mongoUrl || 'mongodb://localhost:27017');
 
-  async get(key: string): Promise<Post> {
-    return new Promise((res, rej) =>
-      this.redisClient.get(key, (err, rep) => {
+    this.collection = new Promise((res, rej) => {
+      this.client.connect((err) => {
         if (err) rej(err);
-        else {
-          try {
-            res(Post.parse(rep));
-          } catch (error) {
-            rej(error);
-          }
-        }
-      })
-    );
-  }
-
-  async set(key: string, val: Post): Promise<void> {
-    return new Promise((res, rej) => {
-      let serialized: string;
-      try {
-        serialized = val.serialize();
-      } catch (error) {
-        rej(error);
-      }
-      this.redisClient.set(key, serialized, (err) => {
-        if (err) rej(err);
-        else res();
+        else res(this.client.db('forodieciocho').collection('forodieciocho'));
       });
     });
   }
 
-  async quit(): Promise<void> {
-    return new Promise((res) => this.redisClient.quit(() => res()));
+  async insert(post: Post): Promise<void> {
+    return new Promise(async (resolve, reject) =>
+      (await this.collection).updateOne(
+        { id: post.id },
+        { $set: post.serialize() },
+        { upsert: true },
+        (err) => {
+          if (err) reject(err);
+          else resolve();
+        }
+      )
+    );
   }
 
-  async chunk(from?: string): Promise<{ posts: Post[]; cursor: string }> {
-    let cursor = from ?? '0';
+  async quit(): Promise<void> {
+    return this.client.close();
+  }
 
-    const reply = await new Promise((res, rej) =>
-      this.redisClient.scan(cursor, 'MATCH', '*', 'COUNT', '10', (err, d) => {
-        if (err) rej(err);
-        else res(d);
-      })
-    );
+  async chunk({
+    from = 0,
+    limit = 10,
+    categoryFilter = undefined,
+    titleContainsFilter = undefined,
+  }: ChunkOpts): Promise<{ posts: Post[]; cursor: number }> {
+    const filter = {} as Record<string, unknown>;
+    if (categoryFilter) filter.category = categoryFilter;
+    if (titleContainsFilter)
+      filter.title = RegExp('.*' + titleContainsFilter + '.*');
 
-    cursor = reply[0];
-    return {
-      posts: await Promise.all(reply[1].map((k) => this.get(k))),
-      cursor,
-    };
+    const posts = (
+      await (await this.collection)
+        .find(filter)
+        .skip(from)
+        .limit(limit)
+        .toArray()
+    ).map((e) => Post.parse(e));
+
+    const cursor = from + posts.length;
+    return { posts, cursor };
   }
 }

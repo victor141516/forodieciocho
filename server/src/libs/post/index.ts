@@ -21,16 +21,19 @@ export class Post {
     this.category = category;
   }
 
-  serialize(): string {
-    return JSON.stringify({
+  serialize(): Record<string, unknown> {
+    return {
       id: this.id,
       title: this.title,
       category: this.category,
-    });
+    };
   }
 
-  static parse(serialized: string): Post {
-    const obj = JSON.parse(serialized);
-    return new Post(obj.id, obj.title, obj.category);
+  static parse(serialized: Record<string, unknown>): Post {
+    return new Post(
+      serialized.id as string,
+      serialized.title as string,
+      serialized.category as PostCategory
+    );
   }
 }

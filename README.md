@@ -12,6 +12,12 @@ docker build -t victor141516/flaresolverr-headful -f Dockerfile.FlareSolverr .
 docker push victor141516/flaresolverr-headful
 ```
 
+## How to build:
+
+```sh
+docker build -t victor141516/forodieciocho:latest .
+```
+
 ## How to run
 
 First lets create a Docker network:
@@ -20,14 +26,25 @@ First lets create a Docker network:
 docker network create forodieciocho
 ```
 
-Then we need redis:
+Then we need mongo:
 
 ```sh
 docker run -d \
-    --name forodieciocho-redis \
+    --name forodieciocho-mongo \
     --network forodieciocho \
-    -v /path/data:/data \
-    -d redis redis-server --appendonly yes
+    -v /path/data:/data/db \
+    mongo
+```
+
+You can also use a web admin for mongo:
+
+```sh
+docker run -d \
+    --name forodieciocho-mongo-express \
+    --network forodieciocho \
+    -p 8081:8081 \
+    -e ME_CONFIG_MONGODB_SERVER=forodieciocho-mongo \
+    mongo-express
 ```
 
 Then we need [FlareSolverr](https://github.com/ngosang/FlareSolverr):
@@ -51,7 +68,7 @@ docker run -d \
     --network forodieciocho \
     --restart always \
     -e PORT=3000 \
-    -e REDIS_HOST=forodieciocho-redis \
+    -e MONGO_URL=mongodb://forodieciocho-mongo:27017 \
     -e FLARESOLVERR_HOST=forodieciocho-flaresolverr \
     -p 3000:3000 \
     victor141516/forodieciocho
