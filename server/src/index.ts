@@ -9,7 +9,7 @@ import { CATEGORY_REGEX, Post, PostCategory } from './libs/post';
 import { Requester } from './libs/requester';
 
 const PORT = process.env.PORT || 3000;
-const db = new Database({ db: 2 });
+const db = new Database({ host: process.env.REDIS_HOST || undefined });
 const requester = new Requester(process.env.REQUESTER_SESSION_ID);
 
 const STATIC = path.resolve(__dirname, 'static');
