@@ -28,7 +28,7 @@ docker run \
     --network forodieciocho \
     --restart always \
     -e PORT=3000 \
-    -p 3000:3000
+    -p 3000:3000 \
     victor141516/forodieciocho
 ```
 
