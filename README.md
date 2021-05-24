@@ -2,6 +2,16 @@
 
 Scrape +1X posts from forocoches
 
+
+## Custom FlareSolverr:
+
+Since FlareSolverr currently doesn't work using `HEADLESS=false` I had to build a custom image:
+
+```sh
+docker build -t victor141516/flaresolverr-headful -f Dockerfile.FlareSolverr .
+docker push victor141516/flaresolverr-headful
+```
+
 ## How to run
 
 First lets create a Docker network:
@@ -27,8 +37,10 @@ docker run -d \
     --name forodieciocho-flaresolverr \
     --network forodieciocho \
     -e LOG_LEVEL=info \
+    -e NO_SANDBOX=true \
+    -e HEADLESS=false \
     --restart unless-stopped \
-    ghcr.io/flaresolverr/flaresolverr:latest
+    victor141516/flaresolverr-headful
 ```
 
 Then run:

@@ -25,8 +25,6 @@ export class Requester {
   private async getNewSessionId(): Promise<string> {
     return this.fetch({
       cmd: 'sessions.create',
-      userAgent:
-        'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/90.0.4430.212 Safari/537.36',
     }).then((r) => r.session);
   }
 
