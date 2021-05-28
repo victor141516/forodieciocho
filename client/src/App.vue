@@ -43,10 +43,13 @@ export default defineComponent({
         const posts = ref<Post[]>([]);
         let nextCursor: number;
         let hasNextPage = true;
+        let isFetchingData = false;
         const getUrlParam = (param: string) =>
             new URLSearchParams(location.search).get(param);
 
         const fetchPosts = async () => {
+            if (isFetchingData) return;
+            isFetchingData = true;
             const params = new URLSearchParams();
 
             if (getUrlParam("from")) params.set("from", getUrlParam("from")!);
@@ -67,6 +70,7 @@ export default defineComponent({
                             (p) => new Post(p.id, p.title, p.category)
                         );
                     }
+                    isFetchingData = false;
                 });
         };
 
