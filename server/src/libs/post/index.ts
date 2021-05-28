@@ -11,14 +11,24 @@ export enum PostCategory {
 }
 
 export class Post {
-  readonly id: string;
-  readonly title: string;
-  readonly category: PostCategory;
+  id: string;
+  title: string;
+  category: PostCategory;
+  createdAt: Date;
+  updatedAt: Date;
 
-  constructor(id: string, title: string, category: PostCategory) {
+  constructor(
+    id: string,
+    title: string,
+    category: PostCategory,
+    createdAt?: Date,
+    updatedAt?: Date
+  ) {
     this.id = id;
     this.title = title;
     this.category = category;
+    this.createdAt = createdAt ?? new Date();
+    this.updatedAt = updatedAt ?? new Date();
   }
 
   serialize(): Record<string, unknown> {
@@ -26,6 +36,8 @@ export class Post {
       id: this.id,
       title: this.title,
       category: this.category,
+      createdAt: this.createdAt.getTime(),
+      updatedAt: this.updatedAt.getTime(),
     };
   }
 
@@ -33,7 +45,9 @@ export class Post {
     return new Post(
       serialized.id as string,
       serialized.title as string,
-      serialized.category as PostCategory
+      serialized.category as PostCategory,
+      new Date(serialized.createdAt as number),
+      new Date(serialized.updatedAt as number)
     );
   }
 }

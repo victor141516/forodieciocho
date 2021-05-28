@@ -24,10 +24,13 @@ export class Database {
   }
 
   async insert(post: Post): Promise<void> {
+    const serializedPost = post.serialize();
+    const { createdAt, ...set } = serializedPost;
+    const setOnInsert = { createdAt };
     return new Promise(async (resolve, reject) =>
       (await this.collection).updateOne(
         { id: post.id },
-        { $set: post.serialize() },
+        { $set: set, $setOnInsert: setOnInsert },
         { upsert: true },
         (err) => {
           if (err) reject(err);
@@ -55,6 +58,7 @@ export class Database {
     const posts = (
       await (await this.collection)
         .find(filter)
+        .sort('updatedAt', -1)
         .skip(from)
         .limit(limit)
         .toArray()
