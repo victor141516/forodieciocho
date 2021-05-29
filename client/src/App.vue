@@ -1,6 +1,8 @@
 <template>
     <div class="xl:w-1/2 md:w-3/4 md:mx-auto sm:mx-2 select-none">
-        <img class="mx-auto" alt="Logo" src="./assets/logo.png" />
+        <a href="/"
+            ><img class="mx-auto" alt="Logo" src="./assets/logo.png"
+        /></a>
         <div class="mt-12">
             <div v-if="posts.length > 0">
                 <div class="flex items-center">
