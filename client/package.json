@@ -8,7 +8,9 @@
   },
   "dependencies": {
     "@tailwindcss/postcss7-compat": "^2.0.2",
+    "@types/luxon": "^1.26.5",
     "autoprefixer": "^9",
+    "luxon": "^1.27.0",
     "postcss": "^7",
     "tailwindcss": "npm:@tailwindcss/postcss7-compat@^2.0.2",
     "vue": "^3.0.11"

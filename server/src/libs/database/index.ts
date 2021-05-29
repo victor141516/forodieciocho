@@ -1,11 +1,17 @@
 import { Collection, MongoClient } from 'mongodb';
 import { Post, PostCategory } from '../post';
 
+export type Order = 'a' | 'd';
 export interface ChunkOpts {
   from?: number;
   limit?: number;
   categoryFilter?: PostCategory;
   titleContainsFilter?: string;
+  order?: Order;
+}
+
+function regexEscape(value: string): string {
+  return value.replace(/[\-\[\]{}()*+?.,\\\^$|#\s]/g, '\\$&');
 }
 
 export class Database {
@@ -49,16 +55,18 @@ export class Database {
     limit = 10,
     categoryFilter = undefined,
     titleContainsFilter = undefined,
+    order = 'a',
   }: ChunkOpts): Promise<{ posts: Post[]; cursor: number }> {
     const filter = {} as Record<string, unknown>;
     if (categoryFilter) filter.category = categoryFilter;
     if (titleContainsFilter)
-      filter.title = RegExp('.*' + titleContainsFilter + '.*');
+      filter.title = RegExp('.*' + regexEscape(titleContainsFilter) + '.*');
+    const sortOrder = { a: -1, d: 1 }[order] ?? -1;
 
     const posts = (
       await (await this.collection)
         .find(filter)
-        .sort('updatedAt', -1)
+        .sort('updatedAt', sortOrder)
         .skip(from)
         .limit(limit)
         .toArray()

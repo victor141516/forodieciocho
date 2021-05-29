@@ -4,7 +4,7 @@ import cors from 'cors';
 import express from 'express';
 import { JSDOM } from 'jsdom';
 
-import { ChunkOpts, Database } from './libs/database';
+import { ChunkOpts, Database, Order } from './libs/database';
 import { CATEGORY_REGEX, Post, PostCategory } from './libs/post';
 import { Requester } from './libs/requester';
 
@@ -59,6 +59,7 @@ app.get('/api/posts', async (req, res) => {
   const params = {} as ChunkOpts;
   if (req.query.from) params.from = Number.parseInt(req.query.from as string);
   if (req.query.search) params.titleContainsFilter = req.query.search as string;
+  if (req.query.order) params.order = req.query.order as Order;
   const { posts, cursor } = await db.chunk(params);
   res
     .json({

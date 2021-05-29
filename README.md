@@ -30,6 +30,7 @@ Then we need mongo:
 
 ```sh
 docker run -d \
+    --restart unless-stopped \
     --name forodieciocho-mongo \
     --network forodieciocho \
     -v /path/data:/data/db \
@@ -40,6 +41,7 @@ You can also use a web admin for mongo:
 
 ```sh
 docker run -d \
+    --restart unless-stopped \
     --name forodieciocho-mongo-express \
     --network forodieciocho \
     -p 8081:8081 \
@@ -51,12 +53,12 @@ Then we need [FlareSolverr](https://github.com/ngosang/FlareSolverr):
 
 ```sh
 docker run -d \
+    --restart unless-stopped \
     --name forodieciocho-flaresolverr \
     --network forodieciocho \
     -e LOG_LEVEL=info \
     -e NO_SANDBOX=true \
     -e HEADLESS=false \
-    --restart unless-stopped \
     victor141516/flaresolverr-headful
 ```
 
@@ -64,14 +66,25 @@ Then run:
 
 ```sh
 docker run -d \
+    --restart unless-stopped \
     --name forodieciocho-app \
     --network forodieciocho \
-    --restart always \
     -e PORT=3000 \
     -e MONGO_URL=mongodb://forodieciocho-mongo:27017 \
     -e FLARESOLVERR_HOST=forodieciocho-flaresolverr \
     -p 3000:3000 \
     victor141516/forodieciocho
+```
+
+You can also schedule the scraping using Docker (or just run that curl anyhow):
+
+```sh
+docker run -dt \
+    --restart unless-stopped \
+    --name forodieciocho-scheduler \
+    --network forodieciocho \
+    curlimages/curl \
+    sh -c 'while true; do curl -s -XPOST "http://forodieciocho-app:3000/api/scrape" && echo '' && sleep 20; done'
 ```
 
 Now you can access to [localhost:3000](http://localhost:3000) and check that there is nothing.\
