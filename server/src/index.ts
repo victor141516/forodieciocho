@@ -28,13 +28,18 @@ const app = express();
 app.use(cors());
 
 app.post('/api/scrape', async (req, res) => {
-  const fcPage = await requester
-    .get(
-      `https://www.forocoches.com/foro/forumdisplay.php?f=2${
-        req.query.page ? '&order=desc&page=' + req.query.page : ''
-      }`
-    )
-    .then((r) => new JSDOM(r));
+  let fcPage: JSDOM;
+  try {
+    fcPage = await requester
+      .get(
+        `https://www.forocoches.com/foro/forumdisplay.php?f=2${
+          req.query.page ? '&order=desc&page=' + req.query.page : ''
+        }`
+      )
+      .then((r) => new JSDOM(r));
+  } catch (error) {
+    return res.send({ error: error.toString() }).end();
+  }
 
   const posts = Array.from(
     fcPage.window.document.querySelectorAll<HTMLLinkElement>(
@@ -60,6 +65,11 @@ app.get('/api/posts', async (req, res) => {
   if (req.query.from) params.from = Number.parseInt(req.query.from as string);
   if (req.query.search) params.titleContainsFilter = req.query.search as string;
   if (req.query.order) params.order = req.query.order as Order;
+  if (req.query.limit)
+    params.limit = Math.min(
+      50,
+      Number.parseInt(req.query.limit as string)
+    ) as number;
   const { posts, cursor } = await db.chunk(params);
   res
     .json({

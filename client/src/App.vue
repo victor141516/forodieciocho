@@ -1,5 +1,7 @@
 <template>
-    <div class="xl:w-1/2 md:w-3/4 md:mx-auto sm:mx-2 select-none">
+    <div
+        class="xl:w-1/2 md:w-3/4 md:mx-auto sm:mx-2 mx-1 select-none md:pb-8 pb-2"
+    >
         <a href="/"
             ><img class="mx-auto" alt="Logo" src="./assets/logo.png"
         /></a>
@@ -12,11 +14,15 @@
                         :page="page"
                     ></PageControl>
                     <Search class="ml-4" @search="onSearch"></Search>
-                    <div
-                        class="ml-auto mr-6 w-8 h-8 text-xl bg-red-400 hover:bg-red-600 border-2 border-red-600 flex items-center justify-center cursor-pointer"
-                        @click="changeOrder"
-                    >
-                        <span>{{ orderIcon }}</span>
+                    <div class="ml-auto flex md:mr-6">
+                        <Limit
+                            @changeLimit="onChangeLimit"
+                            :currentLimit="currentLimitProp"
+                        ></Limit>
+                        <Order
+                            @changeOrder="changeOrder"
+                            :orderIcon="orderIcon"
+                        ></Order>
                     </div>
                 </div>
                 <Post
@@ -25,6 +31,11 @@
                     :key="post.id"
                     :post="post"
                 ></Post>
+                <PageControl
+                    @next="goToNextPage"
+                    @previous="goToPreviousPage"
+                    :page="page"
+                ></PageControl>
             </div>
             <div v-else>
                 <p>LOADING...</p>
@@ -37,6 +48,8 @@
 import { defineComponent, onMounted, ref } from "vue";
 
 import { Post } from "./libs/post";
+import Limit from "./components/Limit.vue";
+import Order from "./components/Order.vue";
 import PostComponent from "./components/Post.vue";
 import PageControl from "./components/PageControl.vue";
 import Search from "./components/Search.vue";
@@ -47,15 +60,17 @@ const getUrlParam = (param: string) =>
 export default defineComponent({
     name: "App",
     components: {
+        Limit,
+        Order,
         Post: PostComponent,
         PageControl,
         Search,
     },
     setup() {
         const posts = ref<Post[]>([]);
-        const limit = 10;
+        const getLimit = () => Number.parseInt(getUrlParam("limit") ?? "10");
         const getPageNumber = () =>
-            Number.parseInt(getUrlParam("from") ?? "0") / limit;
+            Number.parseInt(getUrlParam("from") ?? "0") / getLimit();
         const page = ref(getPageNumber());
         let nextCursor: number;
         let hasNextPage = true;
@@ -71,6 +86,7 @@ export default defineComponent({
                 params.set("search", getUrlParam("search")!);
             if (getUrlParam("order"))
                 params.set("order", getUrlParam("order")!);
+            params.set("limit", getLimit().toString());
 
             return fetch(
                 `${
@@ -79,7 +95,7 @@ export default defineComponent({
             )
                 .then((r) => r.json())
                 .then((r: { cursor: string; posts: any[] }) => {
-                    if (r.posts.length === limit) {
+                    if (r.posts.length === getLimit()) {
                         nextCursor = Number.parseInt(r.cursor);
                     }
                     hasNextPage = r.posts.length !== 0;
@@ -122,7 +138,7 @@ export default defineComponent({
         };
         const goToPreviousPage = () => {
             if (nextCursor === 0) return;
-            nextCursor = Math.max(0, nextCursor - limit * 2);
+            nextCursor = Math.max(0, nextCursor - getLimit() * 2);
             changeUrl({ from: nextCursor });
             fetchPosts();
         };
@@ -150,6 +166,13 @@ export default defineComponent({
             orderIcon.value = getOrderIcon();
         };
 
+        const currentLimitProp = ref(getLimit());
+        const onChangeLimit = (newLimit: number) => {
+            currentLimitProp.value = newLimit;
+            changeUrl({ limit: newLimit });
+            fetchPosts();
+        };
+
         return {
             posts,
             page,
@@ -158,6 +181,8 @@ export default defineComponent({
             onSearch,
             changeOrder,
             orderIcon,
+            currentLimitProp,
+            onChangeLimit,
         };
     },
 });
