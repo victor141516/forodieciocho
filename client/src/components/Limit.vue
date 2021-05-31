@@ -1,10 +1,10 @@
 <template>
     <div
         class="ml-2 md:mr-1 w-8 h-8 bg-red-400 hover:bg-red-600 border-2 border-red-600 flex items-center"
-        @click="$emit('changeLimit', selectedOption)"
     >
         <select
             v-model="selectedOption"
+            @change="$emit('changeLimit', selectedOption)"
             class="bg-transparent appearance-none flex mx-auto outline-none"
         >
             <option v-for="option in options" :key="option" :value="option">
