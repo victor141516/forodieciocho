@@ -14,6 +14,7 @@ const requester = new Requester(process.env.REQUESTER_SESSION_ID);
 
 let STATIC = '';
 let INDEX = '';
+const BLACKLIST_POSTS = ['penya', 'peña'];
 
 try {
   STATIC = path.resolve(__dirname, 'static');
@@ -47,6 +48,12 @@ app.post('/api/scrape', async (req, res) => {
     )
   )
     .filter((e) => CATEGORY_REGEX.test(e.textContent))
+    .filter(
+      (e) =>
+        !BLACKLIST_POSTS.some((w) =>
+          e.textContent.toLocaleLowerCase().includes(w)
+        )
+    )
     .map(
       (e) =>
         new Post(
