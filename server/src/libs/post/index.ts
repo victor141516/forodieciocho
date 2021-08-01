@@ -1,4 +1,4 @@
-export const CATEGORY_REGEX = /(\+1[2-8])/;
+export const CATEGORY_REGEX = /(\+1[2-8])(?:\ |$)/;
 
 export enum PostCategory {
   '+12' = '+12',

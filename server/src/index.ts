@@ -14,7 +14,7 @@ const requester = new Requester(process.env.REQUESTER_SESSION_ID);
 
 let STATIC = '';
 let INDEX = '';
-const BLACKLIST_POSTS = ['penya', 'peña'];
+const BLACKLIST_POSTS = ['penya', 'peña', 'plataforma'];
 
 try {
   STATIC = path.resolve(__dirname, 'static');
