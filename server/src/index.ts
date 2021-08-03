@@ -14,7 +14,15 @@ const requester = new Requester(process.env.REQUESTER_SESSION_ID);
 
 let STATIC = '';
 let INDEX = '';
-const BLACKLIST_POSTS = ['penya', 'peña', 'plataforma'];
+const BLACKLIST_POSTS = [
+  'penya',
+  'peña',
+  'plataforma',
+  'one piece al ritmo',
+  'gifs de ostiones',
+  'lla catalunlla, anime & manga',
+  'conjunta de apuestas',
+];
 
 try {
   STATIC = path.resolve(__dirname, 'static');
