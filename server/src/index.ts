@@ -22,6 +22,7 @@ const BLACKLIST_POSTS = [
   'gifs de ostiones',
   'lla catalunlla, anime & manga',
   'conjunta de apuestas',
+  'P ENYA'
 ];
 
 try {
