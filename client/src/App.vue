@@ -1,51 +1,22 @@
 <template>
     <div class="flex pt-2 lg:pt-14">
-        <div
-            class="
-                flex-1 flex flex-col
-                mx-1
-                lg:mx-6
-                3xl:mx-56
-                select-none
-                md:pb-8
-                pb-2
-            "
-        >
-            <a href="/"
-                ><img class="mx-auto" alt="Logo" src="./assets/logo.png"
-            /></a>
+        <div class="flex-1 flex flex-col mx-1 lg:mx-6 3xl:mx-56 select-none md:pb-8 pb-2">
+            <a href="/">
+                <img class="mx-auto" alt="Logo" src="./assets/logo.png" />
+            </a>
             <div class="mt-2 lg:mt-8">
                 <div v-if="posts.length > 0">
                     <div class="flex items-center">
-                        <PageControl
-                            @next="goToNextPage"
-                            @previous="goToPreviousPage"
-                            :page="page"
-                        ></PageControl>
+                        <PageControl @next="goToNextPage" @previous="goToPreviousPage" :page="page"></PageControl>
                         <Search class="ml-4" @search="onSearch"></Search>
                         <div class="ml-auto flex md:mr-6">
-                            <Limit
-                                @changeLimit="onChangeLimit"
-                                :currentLimit="currentLimitProp"
-                            ></Limit>
-                            <Order
-                                @changeOrder="changeOrder"
-                                :orderIcon="orderIcon"
-                            ></Order>
+                            <Limit @changeLimit="onChangeLimit" :currentLimit="currentLimitProp"></Limit>
+                            <Order @changeOrder="changeOrder" :orderIcon="orderIcon"></Order>
                         </div>
                     </div>
                     <AdPost class="my-2 flex"></AdPost>
-                    <Post
-                        class="my-2 flex"
-                        v-for="post in posts"
-                        :key="post.id"
-                        :post="post"
-                    ></Post>
-                    <PageControl
-                        @next="goToNextPage"
-                        @previous="goToPreviousPage"
-                        :page="page"
-                    ></PageControl>
+                    <Post class="my-2 flex" v-for="post in posts" :key="post.id" :post="post"></Post>
+                    <PageControl @next="goToNextPage" @previous="goToPreviousPage" :page="page"></PageControl>
                 </div>
                 <div v-else>
                     <p>LOADING...</p>
@@ -106,8 +77,7 @@ export default defineComponent({
             params.set("limit", getLimit().toString());
 
             return fetch(
-                `${
-                    import.meta.env.VITE_BACKEND_HOST
+                `${import.meta.env.VITE_BACKEND_HOST
                 }/api/posts?${params.toString()}`
             )
                 .then((r) => r.json())
