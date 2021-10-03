@@ -1,8 +1,5 @@
 <template>
     <div class="flex pt-2 lg:pt-14">
-        <div class="hidden lg:flex mx-auto px-4 pt-48">
-            <ins id="938861" data-width="160" data-height="612"></ins>
-        </div>
         <div
             class="
                 flex-1 flex flex-col
@@ -17,13 +14,6 @@
             <a href="/"
                 ><img class="mx-auto" alt="Logo" src="./assets/logo.png"
             /></a>
-            <div class="hidden lg:flex mx-auto mt-4">
-                <ins id="938856" data-width="728" data-height="102"></ins>
-            </div>
-            <div class="flex lg:hidden mx-auto mt-4">
-                <ins id="938871" data-width="300" data-height="62"></ins>
-            </div>
-
             <div class="mt-2 lg:mt-8">
                 <div v-if="posts.length > 0">
                     <div class="flex items-center">
@@ -61,19 +51,6 @@
                     <p>LOADING...</p>
                 </div>
             </div>
-
-            <div class="hidden lg:flex mx-auto mt-8 h-52">
-                <iframe
-                    style="width: 50rem"
-                    src="https://chaturbate.com/in/?track=default&tour=x1Rd&campaign=Y8Nm5&c=4&p=0&gender=x"
-                ></iframe>
-            </div>
-            <div class="flex lg:hidden mx-auto mt-4">
-                <ins id="938872" data-width="300" data-height="62"></ins>
-            </div>
-        </div>
-        <div class="hidden lg:flex mx-auto px-4 pt-48">
-            <ins id="938864" data-width="160" data-height="612"></ins>
         </div>
     </div>
 </template>
