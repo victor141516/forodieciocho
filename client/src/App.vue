@@ -36,6 +36,7 @@ import Order from './components/Order.vue'
 import PostComponent from './components/Post.vue'
 import PageControl from './components/PageControl.vue'
 import Search from './components/Search.vue'
+import { getPosts } from './services/api'
 
 const getUrlParam = (param: string) => new URLSearchParams(location.search).get(param)
 
@@ -63,27 +64,24 @@ export default defineComponent({
     const fetchPosts = async () => {
       if (isFetchingData) return
       isFetchingData = true
-      const params = new URLSearchParams()
+      const params = {} as Record<string, string>
+      if (getUrlParam('from')) params.from = getUrlParam('from')!
+      if (getUrlParam('search')) params.search = getUrlParam('search')!
+      if (getUrlParam('order')) params.order = getUrlParam('order')!
+      params.limit = getLimit().toString()
 
-      if (getUrlParam('from')) params.set('from', getUrlParam('from')!)
-      if (getUrlParam('search')) params.set('search', getUrlParam('search')!)
-      if (getUrlParam('order')) params.set('order', getUrlParam('order')!)
-      params.set('limit', getLimit().toString())
-
-      return fetch(`${import.meta.env.VITE_BACKEND_HOST}/api/posts?${params.toString()}`)
-        .then((r) => r.json())
-        .then((r: { cursor: string; posts: any[] }) => {
-          if (r.posts.length === getLimit()) {
-            nextCursor = Number.parseInt(r.cursor)
-          }
-          hasNextPage = r.posts.length !== 0
-          if (hasNextPage) {
-            posts.value = r.posts.map(
-              (p) => new Post(p.id, p.title, p.category, new Date(p.createdAt), new Date(p.updatedAt)),
-            )
-          }
-          isFetchingData = false
-        })
+      return getPosts(params).then((r) => {
+        if (r.posts.length === getLimit()) {
+          nextCursor = r.cursor
+        }
+        hasNextPage = r.posts.length !== 0
+        if (hasNextPage) {
+          posts.value = r.posts.map(
+            (p) => new Post(p.id, p.title, p.category, new Date(p.createdAt), new Date(p.updatedAt)),
+          )
+        }
+        isFetchingData = false
+      })
     }
 
     const changeUrl = (params: Record<string, string | number | undefined>) => {
