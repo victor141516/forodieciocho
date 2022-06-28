@@ -26,128 +26,103 @@
   </div>
 </template>
 
-<script lang="ts">
-import { defineComponent, onMounted, ref } from 'vue'
+<script lang="ts" setup>
+import { onMounted, ref } from 'vue'
 
-import { Post, PostCategory } from './libs/post'
+import { Post as PostType, PostCategory } from './libs/post'
 import AdPost from './components/AdPost.vue'
 import Limit from './components/Limit.vue'
 import Order from './components/Order.vue'
-import PostComponent from './components/Post.vue'
+import Post from './components/Post.vue'
 import PageControl from './components/PageControl.vue'
 import Search from './components/Search.vue'
 import { getPosts } from './services/api'
 
 const getUrlParam = (param: string) => new URLSearchParams(location.search).get(param)
 
-export default defineComponent({
-  name: 'App',
-  components: {
-    AdPost,
-    Limit,
-    Order,
-    Post: PostComponent,
-    PageControl,
-    Search,
-  },
-  setup() {
-    const posts = ref<Post[]>(
-      new Array(import.meta.env.PROD ? 0 : 10).fill(new Post('0', 'a', PostCategory['+18'], new Date(), new Date())),
-    )
-    const getLimit = () => Number.parseInt(getUrlParam('limit') ?? '10')
-    const getPageNumber = () => Number.parseInt(getUrlParam('from') ?? '0') / getLimit()
-    const page = ref(getPageNumber())
-    let nextCursor: number
-    let hasNextPage = true
-    let isFetchingData = false
+const posts = ref<PostType[]>(
+  new Array(import.meta.env.PROD ? 0 : 10).fill(new PostType('0', 'a', PostCategory['+18'], new Date(), new Date())),
+)
+const getLimit = () => Number.parseInt(getUrlParam('limit') ?? '10')
+const getPageNumber = () => Number.parseInt(getUrlParam('from') ?? '0') / getLimit()
+const page = ref(getPageNumber())
+let nextCursor: number
+let hasNextPage = true
+let isFetchingData = false
 
-    const fetchPosts = async () => {
-      if (isFetchingData) return
-      isFetchingData = true
-      const params = {} as Record<string, string>
-      if (getUrlParam('from')) params.from = getUrlParam('from')!
-      if (getUrlParam('search')) params.search = getUrlParam('search')!
-      if (getUrlParam('order')) params.order = getUrlParam('order')!
-      params.limit = getLimit().toString()
+const fetchPosts = async () => {
+  if (isFetchingData) return
+  isFetchingData = true
+  const params = {} as Record<string, string>
+  if (getUrlParam('from')) params.from = getUrlParam('from')!
+  if (getUrlParam('search')) params.search = getUrlParam('search')!
+  if (getUrlParam('order')) params.order = getUrlParam('order')!
+  params.limit = getLimit().toString()
 
-      return getPosts(params).then((r) => {
-        if (r.posts.length === getLimit()) {
-          nextCursor = r.cursor
-        }
-        hasNextPage = r.posts.length !== 0
-        if (hasNextPage) {
-          posts.value = r.posts.map(
-            (p) => new Post(p.id, p.title, p.category, new Date(p.createdAt), new Date(p.updatedAt)),
-          )
-        }
-        isFetchingData = false
-      })
+  return getPosts(params).then((r) => {
+    if (r.posts.length === getLimit()) {
+      nextCursor = r.cursor
     }
-
-    const changeUrl = (params: Record<string, string | number | undefined>) => {
-      const query = new URLSearchParams(location.search)
-      Object.keys(params).forEach((k) => {
-        if (params[k] !== undefined) query.set(k, params[k]!.toString())
-        else query.delete(k)
-      })
-      history.pushState(null, '', `${location.origin}${location.pathname}?${query.toString()}`)
-      page.value = getPageNumber()
+    hasNextPage = r.posts.length !== 0
+    if (hasNextPage) {
+      posts.value = r.posts.map(
+        (p) => new PostType(p.id, p.title, p.category, new Date(p.createdAt), new Date(p.updatedAt)),
+      )
     }
-    const goToNextPage = () => {
-      if (!hasNextPage) return
-      changeUrl({ from: nextCursor })
-      fetchPosts()
-    }
-    const goToPreviousPage = () => {
-      if (nextCursor === 0) return
-      nextCursor = Math.max(0, nextCursor - getLimit() * 2)
-      changeUrl({ from: nextCursor })
-      fetchPosts()
-    }
+    isFetchingData = false
+  })
+}
 
-    window.addEventListener('popstate', () => fetchPosts())
+const changeUrl = (params: Record<string, string | number | undefined>) => {
+  const query = new URLSearchParams(location.search)
+  Object.keys(params).forEach((k) => {
+    if (params[k] !== undefined) query.set(k, params[k]!.toString())
+    else query.delete(k)
+  })
+  history.pushState(null, '', `${location.origin}${location.pathname}?${query.toString()}`)
+  page.value = getPageNumber()
+}
+const goToNextPage = () => {
+  if (!hasNextPage) return
+  changeUrl({ from: nextCursor })
+  fetchPosts()
+}
+const goToPreviousPage = () => {
+  if (nextCursor === 0) return
+  nextCursor = Math.max(0, nextCursor - getLimit() * 2)
+  changeUrl({ from: nextCursor })
+  fetchPosts()
+}
 
-    const onSearch = (term: string) => {
-      nextCursor = 0
-      changeUrl({
-        from: undefined,
-        search: term === '' ? undefined : term,
-      })
-      fetchPosts()
-    }
+window.addEventListener('popstate', () => fetchPosts())
 
-    if (import.meta.env.PROD) onMounted(() => fetchPosts())
+const onSearch = (term: string) => {
+  nextCursor = 0
+  changeUrl({
+    from: undefined,
+    search: term === '' ? undefined : term,
+  })
+  fetchPosts()
+}
 
-    const getOrderIcon = () => ((getUrlParam('order') ?? 'a') === 'a' ? '👇' : '☝️')
-    const orderIcon = ref(getOrderIcon())
-    const changeOrder = () => {
-      changeUrl({
-        order: { a: 'd', d: 'a' }[getUrlParam('order') ?? 'a'],
-      })
-      fetchPosts()
-      orderIcon.value = getOrderIcon()
-    }
+if (import.meta.env.PROD) onMounted(() => fetchPosts())
 
-    const currentLimitProp = ref(getLimit())
-    const onChangeLimit = (newLimit: number) => {
-      currentLimitProp.value = newLimit
-      changeUrl({ limit: newLimit })
-      fetchPosts()
-    }
+const getOrderIcon = () => ((getUrlParam('order') ?? 'a') === 'a' ? '👇' : '☝️')
+const orderIcon = ref(getOrderIcon())
+const changeOrder = () => {
+  changeUrl({
+    order: { a: 'd', d: 'a' }[getUrlParam('order') ?? 'a'],
+  })
+  fetchPosts()
+  orderIcon.value = getOrderIcon()
+}
 
-    return {
-      posts,
-      page,
-      goToNextPage,
-      goToPreviousPage,
-      onSearch,
-      changeOrder,
-      orderIcon,
-      currentLimitProp,
-      onChangeLimit,
-    }
-  },
-})
+const currentLimitProp = ref(getLimit())
+const onChangeLimit = (newLimit: number) => {
+  currentLimitProp.value = newLimit
+  changeUrl({ limit: newLimit })
+  fetchPosts()
+}
 </script>
 
 <style>
