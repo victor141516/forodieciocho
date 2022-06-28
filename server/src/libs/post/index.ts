@@ -1,4 +1,4 @@
-export const CATEGORY_REGEX = /(\+1[2-8])(?:\ |$)/;
+export const CATEGORY_REGEX = /(\+1[2-8])(?:\ |$)/
 
 export enum PostCategory {
   '+12' = '+12',
@@ -11,24 +11,18 @@ export enum PostCategory {
 }
 
 export class Post {
-  id: string;
-  title: string;
-  category: PostCategory;
-  createdAt: Date;
-  updatedAt: Date;
+  id: string
+  title: string
+  category: PostCategory
+  createdAt: Date
+  updatedAt: Date
 
-  constructor(
-    id: string,
-    title: string,
-    category: PostCategory,
-    createdAt?: Date,
-    updatedAt?: Date
-  ) {
-    this.id = id;
-    this.title = title;
-    this.category = category;
-    this.createdAt = createdAt ?? new Date();
-    this.updatedAt = updatedAt ?? new Date();
+  constructor(id: string, title: string, category: PostCategory, createdAt?: Date, updatedAt?: Date) {
+    this.id = id
+    this.title = title
+    this.category = category
+    this.createdAt = createdAt ?? new Date()
+    this.updatedAt = updatedAt ?? new Date()
   }
 
   serialize(): Record<string, unknown> {
@@ -38,7 +32,7 @@ export class Post {
       category: this.category,
       createdAt: this.createdAt.getTime(),
       updatedAt: this.updatedAt.getTime(),
-    };
+    }
   }
 
   static parse(serialized: Record<string, unknown>): Post {
@@ -47,7 +41,7 @@ export class Post {
       serialized.title as string,
       serialized.category as PostCategory,
       new Date(serialized.createdAt as number),
-      new Date(serialized.updatedAt as number)
-    );
+      new Date(serialized.updatedAt as number),
+    )
   }
 }
