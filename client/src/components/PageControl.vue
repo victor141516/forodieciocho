@@ -6,7 +6,7 @@
       >⬅️</span
     >
     <span class="w-7 h-8 bg-red-400 border-t-2 border-b-2 border-red-600 flex items-center justify-center">{{
-      page + 1
+      page
     }}</span>
     <span
       @click="$emit('next')"

@@ -14,43 +14,25 @@
   >
 </template>
 
-<script lang="ts">
-import { PropType } from '@vue/runtime-core'
-import { defineComponent } from 'vue'
+<script lang="ts" setup>
 import { DateTime } from 'luxon'
 
-import { Post } from '../libs/post'
+import { Post } from '../services/post'
+defineProps<{ post: Post }>()
 
-export default defineComponent({
-  name: 'Post',
-  props: {
-    post: {
-      type: Object as PropType<Post>,
-      required: true,
-    },
-  },
-  setup(props) {
-    const categories: Record<string, string> = {
-      '+18': '👉👌',
-      '+16': '🎈🎈',
-      '+14': '🍑🍑',
-      unknown: '❓❔',
-    }
-    const getPostIcon = (post: Post): string => {
-      return categories[post.category] ?? categories.unknown
-    }
-    const getFormattedDate = (jsDate: Date) => {
-      const date = DateTime.fromJSDate(jsDate)
-      const { days, hours, minutes } = DateTime.now().diff(date, ['days', 'hours', 'minutes'])
-      if (days > 0) return `hace ${Math.round(days)} días`
-      else if (hours > 0) return `hace ${Math.round(hours)} horas`
-      else return `hace ${Math.round(minutes)} minutos`
-    }
-    return {
-      post: props.post,
-      getPostIcon,
-      getFormattedDate,
-    }
-  },
-})
+const categories: Record<string, string> = {
+  '+18': '👉👌',
+  '+16': '🎈🎈',
+  '+14': '🍑🍑',
+  unknown: '❓❔',
+}
+const getPostIcon = (post: Post): string => {
+  return categories[post.category] ?? categories.unknown
+}
+const getFormattedDate = (date: DateTime) => {
+  const { days, hours, minutes } = DateTime.now().diff(date, ['days', 'hours', 'minutes'])
+  if (days > 0) return `hace ${Math.round(days)} días`
+  else if (hours > 0) return `hace ${Math.round(hours)} horas`
+  else return `hace ${Math.round(minutes)} minutos`
+}
 </script>

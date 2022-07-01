@@ -1,4 +1,5 @@
 import { DateTime } from 'luxon'
+
 import { GetPostsResponsePost } from '../api'
 
 export const CATEGORY_REGEX = /(\+1[2-8])(?:\ |$)/

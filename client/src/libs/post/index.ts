@@ -1,1 +1,0 @@
-../../../../server/src/libs/post/index.ts

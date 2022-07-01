@@ -12,24 +12,11 @@
   </div>
 </template>
 
-<script lang="ts">
-import { defineComponent, PropType, ref } from 'vue'
+<script lang="ts" setup>
+import { ref } from 'vue'
 
-export default defineComponent({
-  name: 'Limit',
-  emits: ['changeLimit'],
-  props: {
-    currentLimit: {
-      type: Number,
-      required: true,
-    },
-  },
-  setup(props) {
-    const options = ref([10, 20, 30, 40, 50])
-    return {
-      options,
-      selectedOption: ref(props.currentLimit),
-    }
-  },
-})
+defineEmits<{ (e: 'changeLimit', value: number): void }>()
+const props = defineProps<{ currentLimit: number }>()
+const options = ref([10, 20, 30, 40, 50])
+const selectedOption = ref(props.currentLimit)
 </script>

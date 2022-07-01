@@ -24,16 +24,11 @@
   </div>
 </template>
 
-<script lang="ts">
-import { defineComponent, ref } from 'vue'
+<script lang="ts" setup>
+import { ref } from 'vue'
 
-export default defineComponent({
-  name: 'Search',
-  emits: ['search'],
-  setup() {
-    const searchTerm = ref('')
-    const shortcurs = ref(['+18', '+16', '+14', '+hd', '+prv'])
-    return { searchTerm, shortcurs }
-  },
-})
+defineEmits<{ (e: 'search', term: string): void }>()
+const props = defineProps<{ initTerm: string }>()
+const searchTerm = ref(props.initTerm)
+const shortcurs = ref(['+18', '+16', '+14', '+hd', '+prv'])
 </script>
