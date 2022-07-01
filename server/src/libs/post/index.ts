@@ -1,8 +1,3 @@
-import { DateTime } from 'luxon'
-import { GetPostsResponsePost } from '../api'
-
-export const CATEGORY_REGEX = /(\+1[2-8])(?:\ |$)/
-
 export enum PostCategory {
   '+12' = '+12',
   '+13' = '+13',
@@ -13,19 +8,35 @@ export enum PostCategory {
   '+18' = '+18',
 }
 
-export class Post {
-  id: string
-  title: string
-  category: PostCategory
-  createdAt: DateTime
-  updatedAt: DateTime
+export interface GetPostsResponsePost {
+  category: PostCategory;
+  createdAt: number;
+  id: string;
+  title: string;
+  updatedAt: number;
+}
 
-  constructor(id: string, title: string, category: PostCategory, createdAt?: DateTime, updatedAt?: DateTime) {
-    this.id = id
-    this.title = title
-    this.category = category
-    this.createdAt = createdAt ?? DateTime.now()
-    this.updatedAt = updatedAt ?? DateTime.now()
+export const CATEGORY_REGEX = /(\+1[2-8])(?: |$)/;
+
+export class Post {
+  id: string;
+  title: string;
+  category: PostCategory;
+  createdAt: Date;
+  updatedAt: Date;
+
+  constructor(
+    id: string,
+    title: string,
+    category: PostCategory,
+    createdAt?: Date,
+    updatedAt?: Date
+  ) {
+    this.id = id;
+    this.title = title;
+    this.category = category;
+    this.createdAt = createdAt ?? new Date();
+    this.updatedAt = updatedAt ?? new Date();
   }
 
   serialize(): Record<string, unknown> {
@@ -33,9 +44,9 @@ export class Post {
       id: this.id,
       title: this.title,
       category: this.category,
-      createdAt: this.createdAt.toMillis(),
-      updatedAt: this.updatedAt.toMillis(),
-    }
+      createdAt: this.createdAt.getTime(),
+      updatedAt: this.updatedAt.getTime(),
+    };
   }
 
   static parse(serialized: GetPostsResponsePost): Post {
@@ -43,8 +54,8 @@ export class Post {
       serialized.id as string,
       serialized.title as string,
       serialized.category as PostCategory,
-      DateTime.fromMillis(serialized.createdAt as number),
-      DateTime.fromMillis(serialized.updatedAt as number),
-    )
+      new Date(serialized.createdAt as number),
+      new Date(serialized.updatedAt as number)
+    );
   }
 }

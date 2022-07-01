@@ -11,7 +11,9 @@ export class Requester {
 
   private async fetch(payload: unknown): Promise<any> {
     return fetch(
-      `http://${process.env.FLARESOLVERR_HOST || 'localhost'}:${process.env.FLARESOLVERR_PORT || '8191'}/v1`,
+      `http://${process.env.FLARESOLVERR_HOST || 'localhost'}:${
+        process.env.FLARESOLVERR_PORT || '8191'
+      }/v1`,
       {
         method: 'POST',
         headers: {

@@ -1,4 +1,5 @@
 import { Collection, MongoClient } from 'mongodb';
+
 import { Post, PostCategory } from '../post';
 
 export type Order = 'a' | 'd';
@@ -11,7 +12,7 @@ export interface ChunkOpts {
 }
 
 function regexEscape(value: string): string {
-  return value.replace(/[\-\[\]{}()*+?.,\\\^$|#\s]/g, '\\$&');
+  return value.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, '\\$&');
 }
 
 export class Database {
