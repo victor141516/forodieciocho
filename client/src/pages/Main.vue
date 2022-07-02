@@ -1,10 +1,10 @@
 <template>
-  <div class="flex pt-2 lg:pt-14">
-    <div class="flex-1 flex flex-col mx-1 lg:mx-6 3xl:mx-56 select-none md:pb-8 pb-2">
-      <a href="/">
+  <div class="w-full lg:w-2/3 xl:w-1/2 mx-auto px-1 lg:px-0">
+    <div class="flex flex-col items-center select-none">
+      <a href="/" class="mt-4">
         <img class="mx-auto" alt="Logo" src="../assets/logo.png" />
       </a>
-      <div class="mt-2 lg:mt-8">
+      <div class="w-full mt-3 lg:mt-8">
         <div v-if="posts.length > 0">
           <div class="flex items-center">
             <PageControl
@@ -18,11 +18,16 @@
               :initTerm="query.search.value"
             ></Search>
             <div class="ml-auto flex md:mr-6">
-              <Limit @changeLimit="(val) => (query.limit.value = val)" :currentLimit="query.limit.value"></Limit>
-              <Order @changeOrder="(val) => (query.order.value = val)" :currentOrder="query.order.value"></Order>
+              <Limit
+                @changeLimit="(val) => (query.limit.value = val)"
+                :currentLimit="query.limit.value"
+                @changeOrder="(val) => (query.order.value = val)"
+                :currentOrder="query.order.value"
+              ></Limit>
+              <!-- <Order @changeOrder="(val) => (query.order.value = val)" :currentOrder="query.order.value"></Order> -->
             </div>
           </div>
-          <Post class="my-2 flex" v-for="post in posts" :key="post.id" :post="post"></Post>
+          <Posts class="my-2 flex" :posts="posts"></Posts>
           <PageControl
             @next="query.page.value++"
             @previous="query.page.value > 1 && query.page.value--"
@@ -46,7 +51,7 @@ import PageControl from '../components/PageControl.vue'
 import Search from '../components/Search.vue'
 import Limit from '../components/Limit.vue'
 import Order from '../components/Order.vue'
-import Post from '../components/Post.vue'
+import Posts from '../components/Posts.vue'
 import { getPosts } from '../services/api'
 import { parseUrlParams } from '../services/query'
 

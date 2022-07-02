@@ -27,6 +27,7 @@ const apiGetPosts = async ({ from, search, order, limit }: GetPostsParams) => {
   search && params.set('search', search)
   order && params.set('order', order)
   limit && params.set('limit', limit)
+  // @ts-ignore
   return fetch(`${import.meta.env.VITE_BACKEND_HOST}/api/posts?${params.toString()}`).then(
     (r) => r.json() as Promise<GetPostsResponse>,
   )
@@ -40,7 +41,7 @@ const generateDevelopmentPosts = (page: number, limit: number, params: Record<st
         new Post(
           `${page}-${i}`,
           `page ${page} post ${i + 1 + calculateFrom({ page, limit })} ${JSON.stringify(params)}`,
-          PostCategory['+18'],
+          Object.keys(PostCategory)[i % Object.keys(PostCategory).length] as PostCategory,
           DateTime.now().minus({ minutes: i + 1 + calculateFrom({ page, limit }) }),
           DateTime.now().minus({ minutes: i + 1 + calculateFrom({ page, limit }) }),
         ),
@@ -66,6 +67,7 @@ export const getPosts = async ({
   order?: GetPostsParams['order']
   limit?: number
 }) => {
+  // @ts-ignore
   if (import.meta.env.PROD) {
     const from = calculateFrom({ page, limit })
     const response = await apiGetPosts({ from: from.toString(), search, order, limit: limit.toString() })
