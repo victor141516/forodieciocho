@@ -12,6 +12,7 @@
       >
         <a
           :href="`https://www.forocoches.com/foro/showthread.php?t=${post.id}`"
+          target="_blank"
           class="block hover:bg-primary-100 text-gray-800 hover:text-primary-700 sm:hover:font-bold transition-all"
           :class="{
             'hover:rounded-t-md': index === 0,
@@ -19,7 +20,7 @@
           }"
         >
           <div class="px-4 py-4 flex">
-            <div class="flex-1 flex items-center justify-between">
+            <div class="flex-1 flex items-center justify-between truncate">
               <p class="text-sm truncate">
                 <span class="text-xs text-gray-600">{{ getPostIcon(post) }}</span>
                 <span class="ml-2">{{ post.title }}</span>
