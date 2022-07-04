@@ -1,5 +1,3 @@
-import * as path from 'path';
-
 import cors from 'cors';
 import express from 'express';
 import { JSDOM } from 'jsdom';
@@ -12,7 +10,6 @@ const PORT = process.env.PORT || 3001;
 const db = new Database(process.env.MONGO_URL);
 const requester = new Requester(process.env.REQUESTER_SESSION_ID);
 
-let STATIC = '';
 let INDEX = '';
 const BLACKLIST_POSTS = [
   'penya',
@@ -22,18 +19,9 @@ const BLACKLIST_POSTS = [
   'gifs de ostiones',
   'lla catalunlla, anime & manga',
   'conjunta de apuestas',
-  'P ENYA'
+  'P ENYA',
 ];
 
-try {
-  STATIC = path.resolve(__dirname, 'static');
-  INDEX = path.resolve(STATIC, 'index.html');
-} catch (error) {
-  console.warn(
-    'Error getting client files. This should only happen during development. Error:',
-    error
-  );
-}
 const app = express();
 app.use(cors());
 
@@ -48,7 +36,7 @@ app.post('/api/scrape', async (req, res) => {
       )
       .then((r) => new JSDOM(r));
   } catch (error) {
-    return res.send({ error: error.toString() }).end();
+    return res.send({ error: error!.toString() }).end();
   }
 
   const posts = Array.from(
@@ -56,19 +44,19 @@ app.post('/api/scrape', async (req, res) => {
       '#threadslist [id^=thread_title_]'
     )
   )
-    .filter((e) => CATEGORY_REGEX.test(e.textContent))
+    .filter((e) => CATEGORY_REGEX.test(e.textContent!))
     .filter(
       (e) =>
         !BLACKLIST_POSTS.some((w) =>
-          e.textContent.toLocaleLowerCase().includes(w)
+          e.textContent!.toLocaleLowerCase().includes(w)
         )
     )
     .map(
       (e) =>
         new Post(
           e.href.split('t=')[1],
-          e.textContent,
-          PostCategory[CATEGORY_REGEX.exec(e.textContent)[0]]
+          e.textContent!,
+          PostCategory[CATEGORY_REGEX.exec(e.textContent!)![0] as PostCategory]
         )
     );
 
@@ -94,8 +82,6 @@ app.get('/api/posts', async (req, res) => {
     })
     .end();
 });
-
-app.use(express.static(STATIC));
 
 app.get('*', function (_, res) {
   res.sendFile(INDEX);

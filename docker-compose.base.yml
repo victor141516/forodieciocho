@@ -1,0 +1,28 @@
+version: "3.9"
+
+services:
+  api:
+    container_name: forodieciocho-api
+    environment:
+      MONGO_URL: mongodb://forodieciocho-mongo:27017
+      FLARESOLVERR_HOST: "${FLARESOLVERR_HOST:-forodieciocho-flaresolverr}"
+      FLARESOLVERR_PORT: 80
+      REQUESTER_SESSION_ID: f91b6120-fbbb-11ec-a7ff-87f1175bca94
+      PORT: 3001
+    depends_on:
+      - mongo
+
+  # forodieciocho-flaresolverr:
+  #   platform: linux/amd64
+  #   container_name: forodieciocho-flaresolverr
+  #   image: victor141516/flaresolverr-headful:latest
+  #   environment:
+  #     - LOG_LEVEL=info
+  #     - NO_SANDBOX=true
+  #     - HEADLESS=false
+
+  mongo:
+    container_name: forodieciocho-mongo
+    image: mongo
+    volumes:
+      - ./db:/data/db

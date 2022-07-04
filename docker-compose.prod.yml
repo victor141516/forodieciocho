@@ -1,0 +1,26 @@
+version: "3.9"
+
+networks:
+  caddywork:
+    external: true
+
+services:
+  api:
+    image: victor141516/forodieciocho-api:latest
+    restart: unless-stopped
+    networks:
+      - caddywork
+
+  # forodieciocho-flaresolverr:
+  #   restart: unless-stopped
+    
+  mongo:
+    restart: unless-stopped
+    
+  scheduler:
+    container_name: forodieciocho-scheduler
+    image: curlimages/curl
+    restart: unless-stopped
+    depends_on:
+      - app
+    command: sh -c 'while true; do curl -s -XPOST "http://forodieciocho-app:3000/api/scrape" && echo '' && sleep 20; done'
