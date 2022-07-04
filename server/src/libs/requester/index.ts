@@ -11,7 +11,7 @@ export class Requester {
       : this.getNewSessionId();
   }
 
-  private async fetch(payload: unknown): Promise<any> {
+  private async fetch<T>(payload: unknown): Promise<T> {
     return fetch(
       `http://${CONFIG.FLARESOLVERR_HOST}:${CONFIG.FLARESOLVERR_PORT}/v1`,
       {
@@ -25,13 +25,13 @@ export class Requester {
   }
 
   private async getNewSessionId(): Promise<string> {
-    return this.fetch({
+    return this.fetch<{ session: string }>({
       cmd: 'sessions.create',
     }).then((r) => r.session);
   }
 
   async get(url: string): Promise<string> {
-    return this.fetch({
+    return this.fetch<{ solution: { response: string } }>({
       cmd: 'request.get',
       url: url,
       maxTimeout: 120000,

@@ -36,7 +36,7 @@ app.post('/api/scrape', async (req, res) => {
       )
       .then((r) => new JSDOM(r));
   } catch (error) {
-    return res.send({ error: error!.toString() }).end();
+    return res.send({ error: error?.toString() }).end();
   }
 
   const posts = Array.from(
