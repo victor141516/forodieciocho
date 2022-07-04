@@ -2,15 +2,15 @@ import cors from 'cors';
 import express from 'express';
 import { JSDOM } from 'jsdom';
 
+import { CONFIG } from './libs/config';
 import { ChunkOpts, Database, Order } from './libs/database';
 import { CATEGORY_REGEX, Post, PostCategory } from './libs/post';
 import { Requester } from './libs/requester';
 
-const PORT = process.env.PORT || 3001;
-const db = new Database(process.env.MONGO_URL);
-const requester = new Requester(process.env.REQUESTER_SESSION_ID);
+const db = new Database(CONFIG.MONGO_URL);
+const requester = new Requester(CONFIG.REQUESTER_SESSION_ID);
 
-let INDEX = '';
+const INDEX = '';
 const BLACKLIST_POSTS = [
   'penya',
   'peña',
@@ -87,8 +87,8 @@ app.get('*', function (_, res) {
   res.sendFile(INDEX);
 });
 
-app.listen(PORT, function () {
-  console.log('Server up and running on ', `http://localhost:${PORT}/`);
+app.listen(CONFIG.PORT, function () {
+  console.log('Server up and running on ', `http://localhost:${CONFIG.PORT}/`);
 });
 
 process.on('exit', () => db.quit());
