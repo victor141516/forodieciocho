@@ -6,8 +6,8 @@ export const CONFIG = {
   FLARESOLVERR_PORT: process.env.FLARESOLVERR_PORT || '8191',
 };
 
-Object.entries(CONFIG).forEach(([k, v]) => {
-  if (v === undefined) {
-    throw new Error(`Missing config: ${k}`);
-  }
-});
+// Object.entries(CONFIG).forEach(([k, v]) => {
+//   if (v === undefined) {
+//     throw new Error(`Missing config: ${k}`);
+//   }
+// });

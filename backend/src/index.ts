@@ -8,6 +8,7 @@ import { CATEGORY_REGEX, Post, PostCategory } from './libs/post';
 import { Requester } from './libs/requester';
 
 const db = new Database(CONFIG.MONGO_URL);
+
 const requester = new Requester(CONFIG.REQUESTER_SESSION_ID);
 
 const INDEX = '';
