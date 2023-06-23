@@ -21,7 +21,7 @@ export const parseUrlParams = () => {
   const urlParams = {
     page: parseInt(urlParamsObj.get('page') ?? '1'),
     limit: parseInt(urlParamsObj.get('limit') ?? '10'),
-    order: (urlParamsObj.get('order') ?? 'a') as 'a' | 'd',
+    order: (urlParamsObj.get('order') ?? 'd') as 'a' | 'd',
     search: urlParamsObj.get('search') ?? '',
   }
   page.value = urlParams.page
