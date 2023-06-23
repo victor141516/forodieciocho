@@ -1,6 +1,6 @@
-import { Collection, MongoClient } from 'mongodb';
+import { Collection, MongoClient, SortDirection } from 'mongodb';
 
-import { Post, PostCategory } from '../post';
+import { GetPostsResponsePost, Post, PostCategory } from '../post';
 
 export type Order = 'a' | 'd';
 export interface ChunkOpts {
@@ -21,30 +21,22 @@ export class Database {
 
   constructor(mongoUrl?: string) {
     this.client = new MongoClient(mongoUrl || 'mongodb://localhost:27017');
-
-    this.collection = new Promise((res, rej) => {
-      this.client.connect((err) => {
-        if (err) rej(err);
-        else res(this.client.db('forodieciocho').collection('forodieciocho'));
-      });
-    });
+    this.collection = this.client
+      .connect()
+      .then((client) => client.db('forodieciocho').collection('forodieciocho'));
   }
 
   async insert(post: Post): Promise<void> {
     const serializedPost = post.serialize();
     const { createdAt, ...set } = serializedPost;
     const setOnInsert = { createdAt };
-    return new Promise(async (resolve, reject) =>
-      (await this.collection).updateOne(
+    return (await this.collection)
+      .updateOne(
         { id: post.id },
         { $set: set, $setOnInsert: setOnInsert },
-        { upsert: true },
-        (err) => {
-          if (err) reject(err);
-          else resolve();
-        }
+        { upsert: true }
       )
-    );
+      .then();
   }
 
   async quit(): Promise<void> {
@@ -62,7 +54,9 @@ export class Database {
     if (categoryFilter) filter.category = categoryFilter;
     if (titleContainsFilter)
       filter.title = RegExp('.*' + regexEscape(titleContainsFilter) + '.*');
-    const sortOrder = { a: -1, d: 1 }[order] ?? -1;
+    const sortOrder: SortDirection =
+      { a: 'asc' as SortDirection, d: 'desc' as SortDirection }[order] ??
+      ('asc' as SortDirection);
 
     const posts = (
       await (await this.collection)
@@ -71,7 +65,7 @@ export class Database {
         .skip(from)
         .limit(limit)
         .toArray()
-    ).map((e) => Post.parse(e));
+    ).map((e) => Post.parse(e as unknown as GetPostsResponsePost));
 
     const cursor = from + posts.length;
     return { posts, cursor };

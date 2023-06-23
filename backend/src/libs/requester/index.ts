@@ -1,5 +1,3 @@
-import fetch from 'node-fetch';
-
 import { CONFIG } from '../config';
 
 export class Requester {
@@ -21,7 +19,7 @@ export class Requester {
         },
         body: JSON.stringify(payload),
       }
-    ).then((r) => r.json());
+    ).then((r) => r.json() as T);
   }
 
   private async getNewSessionId(): Promise<string> {

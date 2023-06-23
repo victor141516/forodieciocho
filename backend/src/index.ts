@@ -1,6 +1,6 @@
 import cors from 'cors';
 import express from 'express';
-import { JSDOM } from 'jsdom';
+import { JSDOM, VirtualConsole } from 'jsdom';
 
 import { CONFIG } from './libs/config';
 import { ChunkOpts, Database, Order } from './libs/database';
@@ -25,6 +25,7 @@ const BLACKLIST_POSTS = [
 
 const app = express();
 app.use(cors());
+const virtualConsole = new VirtualConsole();
 
 app.post('/api/scrape', async (req, res) => {
   let fcPage: JSDOM;
@@ -35,16 +36,16 @@ app.post('/api/scrape', async (req, res) => {
           req.query.page ? '&order=desc&page=' + req.query.page : ''
         }`
       )
-      .then((r) => new JSDOM(r));
+      .then((r) => new JSDOM(r, { virtualConsole }));
   } catch (error) {
     return res.send({ error: error?.toString() }).end();
   }
 
-  const posts = Array.from(
-    fcPage.window.document.querySelectorAll<HTMLLinkElement>(
-      '#threadslist [id^=thread_title_]'
-    )
-  )
+  const postElements = fcPage.window.document.querySelectorAll<HTMLLinkElement>(
+    'main > div#container > section:has(separator) span > a[href*="showthread"]'
+  );
+
+  const posts = Array.from(postElements)
     .filter((e) => CATEGORY_REGEX.test(e.textContent!))
     .filter(
       (e) =>
