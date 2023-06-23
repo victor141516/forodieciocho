@@ -58,7 +58,11 @@ app.post('/api/scrape', async (req, res) => {
         new Post(
           e.href.split('t=')[1],
           e.textContent!,
-          PostCategory[CATEGORY_REGEX.exec(e.textContent!)![0] as PostCategory]
+          PostCategory[
+            CATEGORY_REGEX.exec(
+              e.textContent!.trim()
+            )![0].trim() as PostCategory
+          ]
         )
     );
 
