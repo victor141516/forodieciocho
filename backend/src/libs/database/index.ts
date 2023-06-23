@@ -56,7 +56,7 @@ export class Database {
       filter.title = RegExp('.*' + regexEscape(titleContainsFilter) + '.*');
     const sortOrder: SortDirection =
       { a: 'asc' as SortDirection, d: 'desc' as SortDirection }[order] ??
-      ('asc' as SortDirection);
+      ('desc' as SortDirection);
 
     const posts = (
       await (await this.collection)
