@@ -45,6 +45,10 @@ app.post('/api/scrape', async (req, res) => {
     'main > div#container > section:has(separator) span > a[href*="showthread"]'
   );
 
+  console.log({
+    postElements: Array.from(postElements).map((e) => e.textContent?.trim()),
+  });
+
   const posts = Array.from(postElements)
     .filter((e) => CATEGORY_REGEX.test(e.textContent!))
     .filter(

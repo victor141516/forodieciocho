@@ -16,7 +16,7 @@ export interface GetPostsResponsePost {
   updatedAt: number;
 }
 
-export const CATEGORY_REGEX = /(\+1[2-8])(?: |$)/;
+export const CATEGORY_REGEX = /(\+1[2-8])(?:[^0-9])/;
 
 export class Post {
   id: string;
